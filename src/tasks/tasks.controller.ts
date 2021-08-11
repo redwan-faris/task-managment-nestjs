@@ -1,12 +1,17 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { pipe } from 'rxjs';
+import { GetUser } from 'src/auth/get-user.decorator';
+import User from 'src/auth/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskStatusValidatorPipe } from './pipes/task-status-validator.pipe';
-import { TaskStatus } from './task.model';
+import { TaskStatus } from './tak-status.enums';
 import { Task } from './tasks.entity';
 import { TasksService } from './tasks.service';
 
+
 @Controller('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
     constructor(private taskService:TasksService){}
 
@@ -17,9 +22,21 @@ export class TasksController {
 
     @Post()
     @UsePipes(ValidationPipe)
-    createTask(@Body() createTaskDto:CreateTaskDto):Promise<Task>{
-        return this.taskService.createTask(createTaskDto);
+    createTask(
+         @Body() createTaskDto:CreateTaskDto,
+         @GetUser() user: User,
+         ):Promise<Task>{
+             console.log(user)
+        return this.taskService.createTask(createTaskDto,user);
 
+     }
+
+     @Get('/user-tasks')
+     getUserTasks(
+         @GetUser() user:User
+     ){
+         console.log("user")
+         return this.taskService.getUserTasks(user);
      }
 
     @Get('/:id')
@@ -39,4 +56,6 @@ export class TasksController {
            return this.taskService.updateTaskStatus(id,status)
         
     }
+
+   
 }

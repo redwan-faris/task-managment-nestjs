@@ -1,6 +1,6 @@
+import User from "src/auth/user.entity";
 import { Entity, EntityRepository, Repository } from "typeorm";
 import { CreateTaskDto } from "./dto/create-task.dto";
-import { TaskStatus } from "./task.model";
 import { Task } from "./tasks.entity";
 
 
@@ -15,6 +15,11 @@ import { Task } from "./tasks.entity";
     async updateTaskStatus(task : Task) : Promise<Task>{
         await task.save();
         return task;
+    }
+
+    async getUserTasks(user: User):Promise<Task[]>{
+        const tasks = await this.find({user: user});
+        return tasks;
     }
 }
 
