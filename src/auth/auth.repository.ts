@@ -1,10 +1,11 @@
 import { ConflictException, InternalServerErrorException } from "@nestjs/common";
 import { Entity, EntityRepository, Repository } from "typeorm";
-import { AuthCrdentialsDto } from "./dto/auth-credentails.dto";
-import  User  from "./user.entity";
+import { SignUpCrdentialsDto } from "./dto/signUp-credentails.dto";
+import  User  from "../users/entities/user.entity";
+import { SignInCrdentialsDto } from "./dto/signIn-credentails.dto";
 
 @EntityRepository(User)
-export class UserRepository extends Repository<User>{
+export class AuthRepository extends Repository<User>{
     async singUp(user: User): Promise<void>{
         try{
             await user.save();
@@ -16,8 +17,8 @@ export class UserRepository extends Repository<User>{
     }
     }
 
-    async singIn(authCrdentialsDto: AuthCrdentialsDto){
-        const {username} = authCrdentialsDto;
+    async singIn(signInCrdentialsDto: SignInCrdentialsDto){
+        const {username} = signInCrdentialsDto;
         const user = await this.findOne({username});
         return user;
     }

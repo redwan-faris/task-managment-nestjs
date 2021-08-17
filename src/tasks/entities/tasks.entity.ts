@@ -1,14 +1,13 @@
-import User from "src/auth/user.entity";
+
+import User from "src/users/entities/user.entity";
 import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { TaskStatus } from "./tak-status.enums";
-
-
+import { TaskStatus } from "../tak-status.enums";
 
 @Entity("tasks")
 export class Task extends BaseEntity{
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id: number; 
 
     @Column()
     title: string;

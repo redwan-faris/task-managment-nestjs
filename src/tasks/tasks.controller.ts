@@ -1,20 +1,21 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { pipe } from 'rxjs';
-import { GetUser } from 'src/auth/get-user.decorator';
-import User from 'src/auth/user.entity';
+import { GetUser } from 'src/users/get-user.decorator';
+import User from 'src/users/entities/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { TaskStatusValidatorPipe } from './pipes/task-status-validator.pipe';
-import { TaskStatus } from './tak-status.enums';
-import { Task } from './tasks.entity';
+import { UpdateTaskDto } from './dto/update.task.dto';
+import { Task } from './entities/tasks.entity';
 import { TasksService } from './tasks.service';
+import { JwtAtuhGuard } from 'src/auth/guards/jwt-guard';
+import { hasRoles } from 'src/auth/decorator/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/role.guard';
 
 
 @Controller('tasks')
-@UseGuards(AuthGuard())
+@UseGuards(JwtAtuhGuard,RolesGuard)
 export class TasksController {
     constructor(private taskService:TasksService){}
-
+   // @hasRoles("Admin")
     @Get()
     getAllTasks(): Promise<Task[]>{
         return this.taskService.getAllTasks();
@@ -31,6 +32,8 @@ export class TasksController {
 
      }
 
+     
+     @hasRoles('Admin')
      @Get('/user-tasks')
      getUserTasks(
          @GetUser() user:User
@@ -51,9 +54,9 @@ export class TasksController {
     }
 
     @Patch('/:id/status')
-    updateTaskStatus(@Body("status", TaskStatusValidatorPipe) status:TaskStatus, @Param("id") id:number){
+    updateTaskStatus(@Body() updateTaskDto: UpdateTaskDto, @Param("id") id:number){
         
-           return this.taskService.updateTaskStatus(id,status)
+           return this.taskService.updateTaskStatus(updateTaskDto,id)
         
     }
 
